@@ -26,10 +26,59 @@
   </div>
 
 <script>
-  const addItems = document.querySelector('.add-items');
-  const itemsList = document.querySelector('.plates');
-  const items = [];
+  const addItems = document.querySelector('.add-items')
+  const itemsList = document.querySelector('.plates')
+  const items = JSON.parse(localStorage.getItem('items')) || []
 
+  const addItem = (e) => {
+    e.preventDefault()
+    const text = (e.target.querySelector('[name=item]')).value
+    const item = {
+      text,
+      done: false
+    }
+
+    items.push(item)
+
+    const htmlList = createHTMLList(items)
+    const jsonItems = JSON.stringify(items)
+    localStorage.setItem('items', jsonItems)
+    itemsList.innerHTML = htmlList
+
+    // Reset form
+    e.target.reset()
+  }
+
+  const createHTMLList = (items = []) => {
+    return items.map((item, i) => {
+      return `
+        <li>
+          <input type="checkbox" data-index=${i} id="item${i}" ${item.done ? 'checked' : ''}/>
+          <label for="item${i}">${item.text}</label>
+        </li>
+      `
+    }).join('')
+  }
+
+  const toggleDone = (e) => {
+    const el = e.target
+
+    if (!el.matches('input')) return
+
+    const index = el.dataset.index
+    items[index].done = !items[index].done
+
+    localStorage.setItem('items', JSON.stringify(items))
+
+    const htmlList = createHTMLList(items)
+    itemsList.innerHTML = htmlList
+  }
+
+  addItems.addEventListener('submit', addItem)
+  itemsList.addEventListener('click', toggleDone)
+
+  const htmlList = createHTMLList(items)
+  itemsList.innerHTML = htmlList
 </script>
 
 
